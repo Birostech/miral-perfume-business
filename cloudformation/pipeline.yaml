@@ -122,24 +122,21 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - cloudformation:DescribeStacks
-              - cloudformation:CreateStack
-              - cloudformation:UpdateStack
-              - cloudformation:CreateChangeSet
-              - cloudformation:ExecuteChangeSet
-              - cloudformation:DescribeChangeSet
-              - cloudformation:GetTemplate
-              - cloudfront:CreateInvalidation
-              - iam:PassRole
-              - iam:CreateRole
-              - iam:AttachRolePolicy
-              - iam:PutRolePolicy
-              - iam:GetRole
+              - cloudformation:*
+              - cloudfront:*
               - cognito-idp:*
               - dynamodb:*
               - lambda:*
               - apigateway:*
               - s3:*
+              - iam:PassRole
+              - iam:CreateRole
+              - iam:AttachRolePolicy
+              - iam:PutRolePolicy
+              - iam:GetRole
+              - iam:DeleteRole
+              - iam:DetachRolePolicy
+              - logs:*
             Resource: "*"
 
   # ── IAM: CloudFormation Deployment Role ──────────────────────
