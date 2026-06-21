@@ -109,6 +109,8 @@ Resources:
           AttributeDataType: String
           Mutable: false
           Required: false
+      LambdaConfig:
+        PreSignUp: !GetAtt PreSignUpFunction.Arn
       UserPoolTags:
         Project: ScentsByMiral
 
@@ -213,6 +215,31 @@ Resources:
                   - !GetAtt WishlistTable.Arn
                   - !GetAtt AddressesTable.Arn
                   - !GetAtt ProductsTable.Arn
+
+  # ── Lambda: Pre-SignUp Trigger ───────────────────────────────
+  # Auto-confirms every new Cognito user instantly so they can
+  # sign in immediately after creating an account — no email code needed.
+  PreSignUpFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: sbm-presignup
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            event.response.autoConfirmUser = true;
+            return event;
+          };
+
+  PreSignUpPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt PreSignUpFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserPool.Arn
 
   # ── Lambda: API Handler ──────────────────────────────────────
   # One function handles all API routes (wishlist, addresses, products).
