@@ -208,6 +208,11 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3500);
     }
+
+    // ── Show success message if arriving from signup ─────────
+    if (new URLSearchParams(window.location.search).get('created') === '1') {
+      showToast('Account created! Please sign in to continue.');
+    }
   </script>
 </body>
 </html>

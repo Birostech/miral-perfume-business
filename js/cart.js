@@ -3,18 +3,23 @@
    ============================================================ */
 
 const Cart = (() => {
-  const STORAGE_KEY = 'sbm_cart';
+  let _key = 'sbm_cart_guest';
+
+  function setUser(userId) {
+    _key = userId ? `sbm_cart_${userId}` : 'sbm_cart_guest';
+    updateCartUI();
+  }
 
   function getCart() {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      return JSON.parse(localStorage.getItem(_key)) || [];
     } catch {
       return [];
     }
   }
 
   function saveCart(cart) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    localStorage.setItem(_key, JSON.stringify(cart));
     updateCartUI();
   }
 
@@ -77,7 +82,7 @@ const Cart = (() => {
     });
   }
 
-  return { getCart, addItem, removeItem, updateQty, getCount, getSubtotal, updateCartUI };
+  return { getCart, addItem, removeItem, updateQty, getCount, getSubtotal, updateCartUI, setUser };
 })();
 
 /* ── Toast Notification ──────────────────────────────────── */

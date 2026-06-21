@@ -206,7 +206,7 @@
         btn.textContent = 'Create My Account';
         btn.disabled = false;
         if (result.ok) {
-          window.location.href = 'account.html';
+          window.location.href = 'login.html?created=1';
         } else {
           errEl.textContent = result.error;
           errEl.classList.add('show');

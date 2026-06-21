@@ -23,13 +23,15 @@ const Auth = (() => {
   }
 
   function _setSession(payload, token) {
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+    const user = {
       id:        payload.sub,
       name:      payload.name || payload.email.split('@')[0],
       email:     payload.email,
       token,
       createdAt: payload['custom:createdAt'] || new Date().toISOString()
-    }));
+    };
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+    if (typeof Cart !== 'undefined') Cart.setUser(user.id);
   }
 
   function _clearSession() {
@@ -67,8 +69,8 @@ const Auth = (() => {
 
     userPool.signUp(email, password, attributes, null, (err) => {
       if (err) { callback({ ok: false, error: _friendlyError(err) }); return; }
-      // Auto sign-in immediately after signup
-      login(email, password, callback);
+      // Account created — do NOT auto sign-in. User must log in manually.
+      callback({ ok: true });
     });
   }
 
@@ -104,6 +106,7 @@ const Auth = (() => {
   // ── logout() ────────────────────────────────────────────────
 
   function logout() {
+    if (typeof Cart !== 'undefined') Cart.setUser(null);
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) cognitoUser.signOut();
     _clearSession();
@@ -203,16 +206,19 @@ function syncNavAuth() {
   const user  = Auth.currentUser();
   const btn   = document.getElementById('nav-account-btn');
   const label = document.getElementById('nav-account-label');
-  if (!btn) return;
-  if (user) {
-    btn.href = 'account.html';
-    btn.classList.add('logged-in');
-    if (label) label.textContent = user.name.split(' ')[0];
-  } else {
-    btn.href = 'login.html';
-    btn.classList.remove('logged-in');
-    if (label) label.textContent = 'Sign In';
+  if (btn) {
+    if (user) {
+      btn.href = 'account.html';
+      btn.classList.add('logged-in');
+      if (label) label.textContent = user.name.split(' ')[0];
+    } else {
+      btn.href = 'login.html';
+      btn.classList.remove('logged-in');
+      if (label) label.textContent = 'Sign In';
+    }
   }
+  // Point the cart at this user's storage slot
+  if (typeof Cart !== 'undefined') Cart.setUser(user ? user.id : null);
 }
 
 document.addEventListener('DOMContentLoaded', syncNavAuth);
