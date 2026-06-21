@@ -12,7 +12,7 @@ phases:
       nodejs: 20
     commands:
       - echo "Installing Lambda dependencies..."
-      - cd lambda/api && npm ci --production && cd ../..
+      - cd lambda/api && npm install --production && cd ../..
 
   build:
     commands:

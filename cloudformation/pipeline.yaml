@@ -96,30 +96,20 @@ Resources:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
-                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
                 Resource: "*"
               - Effect: Allow
-                Action: [s3:GetObject, s3:PutObject, s3:DeleteObject, s3:ListBucket]
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                  - s3:ListBucket
                 Resource:
                   - !GetAtt ArtifactBucket.Arn
                   - !Sub "${ArtifactBucket.Arn}/*"
-                  # Also needs access to the website bucket (created by infrastructure.yaml)
-                  - !Sub "arn:aws:s3:::scents-by-miral-website-${AWS::AccountId}"
-                  - !Sub "arn:aws:s3:::scents-by-miral-website-${AWS::AccountId}/*"
-              - Effect: Allow
-                Action:
-                  - cloudformation:DescribeStacks
-                  - cloudformation:CreateStack
-                  - cloudformation:UpdateStack
-                  - cloudformation:CreateChangeSet
-                  - cloudformation:ExecuteChangeSet
-                  - cloudformation:DescribeChangeSet
-                  - cloudformation:GetTemplate
-                Action2: [cloudfront:CreateInvalidation]
-                Resource: "*"
-              - Effect: Allow
-                Action: [iam:PassRole]
-                Resource: !GetAtt CloudFormationRole.Arn
 
   # Simplified combined policy to avoid YAML syntax issues above
   CodeBuildExtraPolicy:
