@@ -94,8 +94,6 @@ Resources:
       UserPoolName: scents-by-miral-users
       UsernameAttributes:
         - email                       # users log in with email, not username
-      AutoVerifiedAttributes:
-        - email                       # Cognito sends a verification email on signup
       Policies:
         PasswordPolicy:
           MinimumLength: 6
@@ -107,6 +105,10 @@ Resources:
           AttributeDataType: String
           Mutable: true
           Required: true
+        - Name: createdAt
+          AttributeDataType: String
+          Mutable: false
+          Required: false
       UserPoolTags:
         Project: ScentsByMiral
 
