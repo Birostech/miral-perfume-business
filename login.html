@@ -114,6 +114,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js/dist/amazon-cognito-identity.min.js"></script>
   <script src="js/products.js"></script>
   <script src="js/auth.js"></script>
   <script>
@@ -177,14 +178,21 @@
         localStorage.removeItem('sbm_remember_email');
       }
 
-      const result = Auth.login(email, password);
-      if (result.ok) {
-        const next = new URLSearchParams(window.location.search).get('next') || 'account.html';
-        window.location.href = next;
-      } else {
-        errEl.textContent = result.error;
-        errEl.classList.add('show');
-      }
+      const btn = document.querySelector('.auth-submit');
+      btn.textContent = 'Signing in…';
+      btn.disabled = true;
+
+      Auth.login(email, password, (result) => {
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+        if (result.ok) {
+          const next = new URLSearchParams(window.location.search).get('next') || 'account.html';
+          window.location.href = next;
+        } else {
+          errEl.textContent = result.error;
+          errEl.classList.add('show');
+        }
+      });
     });
 
     // ── Toast helper (minimal) ───────────────────────────────

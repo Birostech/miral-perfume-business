@@ -124,6 +124,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js/dist/amazon-cognito-identity.min.js"></script>
   <script src="js/products.js"></script>
   <script src="js/auth.js"></script>
   <script>
@@ -197,13 +198,20 @@
         errEl.classList.add('show'); return;
       }
 
-      const result = Auth.signup(name, email, password);
-      if (result.ok) {
-        window.location.href = 'account.html';
-      } else {
-        errEl.textContent = result.error;
-        errEl.classList.add('show');
-      }
+      const btn = document.querySelector('.auth-submit');
+      btn.textContent = 'Creating account…';
+      btn.disabled = true;
+
+      Auth.signup(name, email, password, (result) => {
+        btn.textContent = 'Create My Account';
+        btn.disabled = false;
+        if (result.ok) {
+          window.location.href = 'account.html';
+        } else {
+          errEl.textContent = result.error;
+          errEl.classList.add('show');
+        }
+      });
     });
   </script>
 </body>

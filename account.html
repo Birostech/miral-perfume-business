@@ -272,25 +272,28 @@
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/amazon-cognito-identity-js/dist/amazon-cognito-identity.min.js"></script>
   <script src="js/products.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // ── Guard ───────────────────────────────────────────────
-    const currentUser = Auth.currentUser();
-    if (!currentUser) window.location.href = 'login.html';
+    // ── Guard — validates the Cognito session, then boots the page ──
+    // Quick check from sessionStorage first so the redirect is instant
+    // if the user is clearly not logged in.
+    if (!Auth.currentUser()) window.location.href = 'login.html';
+
+    // Then verify with Cognito (refreshes token if needed).
+    Auth.refreshSession((user) => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      bootPage(user);
+    });
+
+    function bootPage(currentUser) {
 
     // ── Helpers ─────────────────────────────────────────────
     function formatMonthYear(isoStr) {
       if (!isoStr) return '—';
       return new Date(isoStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-    }
-
-    function getFullUser() {
-      try {
-        const users = JSON.parse(localStorage.getItem('sbm_users') || '[]');
-        return users.find(u => u.id === currentUser.id) || currentUser;
-      } catch { return currentUser; }
     }
 
     // ── Per-user keys ────────────────────────────────────────
@@ -307,7 +310,6 @@
     }
 
     // ── Populate sidebar ─────────────────────────────────────
-    const fullUser = getFullUser();
     const nameEl      = document.getElementById('account-name');
     const emailEl     = document.getElementById('account-email');
     const avatarEl    = document.getElementById('account-avatar');
@@ -320,12 +322,12 @@
     avatarEl.textContent = currentUser.name.charAt(0).toUpperCase();
     if (navLabel) navLabel.textContent = currentUser.name.split(' ')[0];
     memberIdEl.textContent = 'Member ID: #SBM-' + String(currentUser.id).slice(-6).toUpperCase();
-    memberSnEl.textContent = 'Since ' + formatMonthYear(fullUser.createdAt);
+    memberSnEl.textContent = 'Since ' + formatMonthYear(currentUser.createdAt);
 
     // ── Populate welcome banner ──────────────────────────────
     document.getElementById('wb-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
     document.getElementById('wb-name').textContent   = 'Welcome back, ' + currentUser.name.split(' ')[0] + '!';
-    document.getElementById('wb-sub').textContent    = currentUser.email + '  ·  Member since ' + formatMonthYear(fullUser.createdAt);
+    document.getElementById('wb-sub').textContent    = currentUser.email + '  ·  Member since ' + formatMonthYear(currentUser.createdAt);
 
     // ── Stats refresh ────────────────────────────────────────
     function refreshStats() {
@@ -369,21 +371,25 @@
       errEl.classList.remove('show');
       succEl.style.display = 'none';
       if (!name || !email) { errEl.textContent = 'Name and email are required.'; errEl.classList.add('show'); return; }
-      const result = Auth.updateProfile(name, email);
-      if (result.ok) {
-        const fresh = Auth.currentUser();
-        nameEl.textContent   = fresh.name;
-        emailEl.textContent  = fresh.email;
-        avatarEl.textContent = fresh.name.charAt(0).toUpperCase();
-        document.getElementById('wb-avatar').textContent = fresh.name.charAt(0).toUpperCase();
-        document.getElementById('wb-name').textContent   = 'Welcome back, ' + fresh.name.split(' ')[0] + '!';
-        document.getElementById('wb-sub').textContent    = fresh.email + '  ·  Member since ' + formatMonthYear(fullUser.createdAt);
-        if (navLabel) navLabel.textContent = fresh.name.split(' ')[0];
-        succEl.style.display = 'block';
-      } else {
-        errEl.textContent = result.error;
-        errEl.classList.add('show');
-      }
+      const saveBtn = e.target.querySelector('button[type="submit"]');
+      saveBtn.textContent = 'Saving…'; saveBtn.disabled = true;
+      Auth.updateProfile(name, email, (result) => {
+        saveBtn.textContent = 'Save Changes'; saveBtn.disabled = false;
+        if (result.ok) {
+          const fresh = Auth.currentUser();
+          nameEl.textContent   = fresh.name;
+          emailEl.textContent  = fresh.email;
+          avatarEl.textContent = fresh.name.charAt(0).toUpperCase();
+          document.getElementById('wb-avatar').textContent = fresh.name.charAt(0).toUpperCase();
+          document.getElementById('wb-name').textContent   = 'Welcome back, ' + fresh.name.split(' ')[0] + '!';
+          document.getElementById('wb-sub').textContent    = fresh.email + '  ·  Member since ' + formatMonthYear(currentUser.createdAt);
+          if (navLabel) navLabel.textContent = fresh.name.split(' ')[0];
+          succEl.style.display = 'block';
+        } else {
+          errEl.textContent = result.error;
+          errEl.classList.add('show');
+        }
+      });
     });
 
     // ── Password form ────────────────────────────────────────
@@ -399,9 +405,13 @@
       if (!current || !next || !confirm) { errEl.textContent = 'All fields are required.'; errEl.classList.add('show'); return; }
       if (next.length < 6) { errEl.textContent = 'New password must be at least 6 characters.'; errEl.classList.add('show'); return; }
       if (next !== confirm) { errEl.textContent = 'Passwords do not match.'; errEl.classList.add('show'); return; }
-      const result = Auth.changePassword(current, next);
-      if (result.ok) { document.getElementById('password-form').reset(); succEl.style.display = 'block'; }
-      else { errEl.textContent = result.error; errEl.classList.add('show'); }
+      const pwBtn = e.target.querySelector('button[type="submit"]');
+      pwBtn.textContent = 'Updating…'; pwBtn.disabled = true;
+      Auth.changePassword(current, next, (result) => {
+        pwBtn.textContent = 'Update Password'; pwBtn.disabled = false;
+        if (result.ok) { document.getElementById('password-form').reset(); succEl.style.display = 'block'; }
+        else { errEl.textContent = result.error; errEl.classList.add('show'); }
+      });
     });
 
     // ── Wishlist ─────────────────────────────────────────────
@@ -517,6 +527,8 @@
 
     // ── Cart count ───────────────────────────────────────────
     Cart.updateCartUI();
+
+    } // end bootPage
   </script>
 </body>
 </html>
