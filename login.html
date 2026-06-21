@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Scents by Miral</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="auth-page">
+
+    <!-- Left panel -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div class="auth-left-brand">
+          <a href="index.html">
+            <span class="brand-main">Scents by Miral</span>
+            <span class="brand-sub">Luxury Fragrances</span>
+          </a>
+        </div>
+        <h2>Your Scent Journey Continues Here</h2>
+        <p>Sign in to access your personal dashboard, track orders, and unlock exclusive member offers.</p>
+
+        <ul class="auth-benefits">
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Personalised shopping experience</span>
+          </li>
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Save your wishlist & addresses</span>
+          </li>
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Early access to new launches</span>
+          </li>
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Order history at a glance</span>
+          </li>
+        </ul>
+
+        <div class="auth-left-image">
+          <img
+            src="https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=400&q=80"
+            alt="Luxury perfume collection"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="auth-right">
+      <div class="auth-card">
+        <div class="auth-card-header">
+          <h2>Welcome Back</h2>
+          <p>Don't have an account? <a href="signup.html">Create one</a></p>
+        </div>
+
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="auth-form-group">
+            <label>Email Address</label>
+            <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="auth-form-group">
+            <label>
+              Password
+              <a href="#" class="forgot-link" id="forgot-link">Forgot password?</a>
+            </label>
+            <div class="pw-field">
+              <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password" />
+              <button type="button" class="pw-toggle" id="pw-toggle-login" aria-label="Show password">
+                <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="auth-remember">
+            <input type="checkbox" id="remember-me" />
+            <label for="remember-me">Remember my email</label>
+          </div>
+          <div id="login-error" class="auth-error"></div>
+          <button type="submit" class="auth-submit">Sign In</button>
+          <div class="auth-divider">or</div>
+          <a href="shop.html" class="btn btn-outline" style="text-align:center;width:100%;justify-content:center;">
+            Continue Browsing
+          </a>
+        </form>
+
+        <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--text-dim);text-align:center;">
+          <a href="index.html" style="color:var(--text-dim);">← Back to Home</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot password modal -->
+  <div id="forgot-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9000;display:none;align-items:center;justify-content:center;padding:2rem;">
+    <div style="background:var(--bg-card);border:1px solid var(--border-gold);border-radius:4px;padding:2rem;max-width:400px;width:100%;">
+      <h3 style="font-size:1.2rem;margin-bottom:0.75rem;">Reset Password</h3>
+      <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1.25rem;">Enter your email address and we'll send you a reset link.</p>
+      <input type="email" id="reset-email" placeholder="you@example.com" style="width:100%;background:var(--bg-deep);border:1px solid var(--border);color:var(--text-primary);padding:0.85rem 1rem;border-radius:4px;font-family:inherit;font-size:0.95rem;margin-bottom:1rem;" />
+      <div style="display:flex;gap:0.75rem;">
+        <button type="button" class="btn btn-gold" style="flex:1;" id="reset-submit">Send Reset Link</button>
+        <button type="button" class="btn btn-ghost" id="reset-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/products.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    if (Auth.currentUser()) window.location.href = 'account.html';
+
+    // ── Remember me ─────────────────────────────────────────
+    const savedEmail = localStorage.getItem('sbm_remember_email');
+    if (savedEmail) {
+      document.getElementById('login-email').value = savedEmail;
+      document.getElementById('remember-me').checked = true;
+    }
+
+    // ── Password toggle ──────────────────────────────────────
+    const pwInput  = document.getElementById('login-password');
+    const pwToggle = document.getElementById('pw-toggle-login');
+    pwToggle.addEventListener('click', () => {
+      const isText = pwInput.type === 'text';
+      pwInput.type = isText ? 'password' : 'text';
+      pwToggle.querySelector('.eye-open').style.display  = isText ? '' : 'none';
+      pwToggle.querySelector('.eye-closed').style.display = isText ? 'none' : '';
+    });
+
+    // ── Forgot password ──────────────────────────────────────
+    const modal = document.getElementById('forgot-modal');
+    document.getElementById('forgot-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.style.display = 'flex';
+      const email = document.getElementById('login-email').value.trim();
+      if (email) document.getElementById('reset-email').value = email;
+    });
+    document.getElementById('reset-cancel').addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    document.getElementById('reset-submit').addEventListener('click', () => {
+      const email = document.getElementById('reset-email').value.trim();
+      if (!email || !email.includes('@')) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+      modal.style.display = 'none';
+      showToast('If that email is registered, a reset link has been sent.');
+    });
+
+    // ── Form submit ──────────────────────────────────────────
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const remember = document.getElementById('remember-me').checked;
+      const errEl    = document.getElementById('login-error');
+
+      if (!email || !password) {
+        errEl.textContent = 'Please fill in all fields.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      if (remember) {
+        localStorage.setItem('sbm_remember_email', email);
+      } else {
+        localStorage.removeItem('sbm_remember_email');
+      }
+
+      const result = Auth.login(email, password);
+      if (result.ok) {
+        const next = new URLSearchParams(window.location.search).get('next') || 'account.html';
+        window.location.href = next;
+      } else {
+        errEl.textContent = result.error;
+        errEl.classList.add('show');
+      }
+    });
+
+    // ── Toast helper (minimal) ───────────────────────────────
+    function showToast(msg) {
+      let t = document.querySelector('.toast');
+      if (!t) {
+        t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = '<span class="toast-icon">✦</span><span class="toast-msg"></span>';
+        document.body.appendChild(t);
+      }
+      t.querySelector('.toast-msg').textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+  </script>
+</body>
+</html>

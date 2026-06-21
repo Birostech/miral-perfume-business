@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — Scents by Miral</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="auth-page">
+
+    <!-- Left panel -->
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div class="auth-left-brand">
+          <a href="index.html">
+            <span class="brand-main">Scents by Miral</span>
+            <span class="brand-sub">Luxury Fragrances</span>
+          </a>
+        </div>
+        <h2>Join the World of Scents by Miral</h2>
+        <p>Create your account for a personalised luxury experience — exclusive access, early launches, and more.</p>
+
+        <ul class="auth-benefits">
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Your own personal dashboard</span>
+          </li>
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Save your wishlist & delivery addresses</span>
+          </li>
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Early access to limited editions</span>
+          </li>
+          <li>
+            <span class="auth-benefit-icon">✦</span>
+            <span>Exclusive member-only offers</span>
+          </li>
+        </ul>
+
+        <div class="auth-left-image">
+          <img
+            src="https://images.unsplash.com/photo-1541643600914-78b084683702?auto=format&fit=crop&w=400&q=80"
+            alt="Luxury perfume"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="auth-right">
+      <div class="auth-card">
+        <div class="auth-card-header">
+          <h2>Create Account</h2>
+          <p>Already have an account? <a href="login.html">Sign in</a></p>
+        </div>
+
+        <form class="auth-form" id="signup-form" novalidate>
+          <div class="auth-form-group">
+            <label>Full Name</label>
+            <input type="text" id="signup-name" placeholder="Your full name" autocomplete="name" />
+          </div>
+          <div class="auth-form-group">
+            <label>Email Address</label>
+            <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="auth-form-group">
+            <label>Password</label>
+            <div class="pw-field">
+              <input type="password" id="signup-password" placeholder="Choose a password (min. 6 chars)" autocomplete="new-password" />
+              <button type="button" class="pw-toggle" id="pw-toggle-1" aria-label="Show password">
+                <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
+            <div class="pw-strength" id="pw-strength" style="display:none;">
+              <div class="pw-strength-bars">
+                <div class="pw-bar" id="bar1"></div>
+                <div class="pw-bar" id="bar2"></div>
+                <div class="pw-bar" id="bar3"></div>
+                <div class="pw-bar" id="bar4"></div>
+              </div>
+              <span class="pw-strength-label" id="pw-strength-label">Weak</span>
+            </div>
+          </div>
+          <div class="auth-form-group">
+            <label>Confirm Password</label>
+            <div class="pw-field">
+              <input type="password" id="signup-confirm" placeholder="Repeat your password" autocomplete="new-password" />
+              <button type="button" class="pw-toggle" id="pw-toggle-2" aria-label="Show confirm password">
+                <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none">
+                  <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div id="signup-error" class="auth-error"></div>
+          <button type="submit" class="auth-submit">Create My Account</button>
+          <div class="auth-divider">or</div>
+          <a href="shop.html" class="btn btn-outline" style="text-align:center;width:100%;justify-content:center;">
+            Browse First
+          </a>
+        </form>
+
+        <p style="margin-top:1.5rem;font-size:0.72rem;color:var(--text-dim);text-align:center;line-height:1.6;">
+          By creating an account you agree to our Terms of Service.<br/>
+          <a href="index.html" style="color:var(--text-dim);">← Back to Home</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/products.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    if (Auth.currentUser()) window.location.href = 'account.html';
+
+    // ── Password toggles ─────────────────────────────────────
+    function makeToggle(btnId, inputEl) {
+      document.getElementById(btnId).addEventListener('click', () => {
+        const btn = document.getElementById(btnId);
+        const isText = inputEl.type === 'text';
+        inputEl.type = isText ? 'password' : 'text';
+        btn.querySelector('.eye-open').style.display  = isText ? '' : 'none';
+        btn.querySelector('.eye-closed').style.display = isText ? 'none' : '';
+      });
+    }
+    makeToggle('pw-toggle-1', document.getElementById('signup-password'));
+    makeToggle('pw-toggle-2', document.getElementById('signup-confirm'));
+
+    // ── Password strength ────────────────────────────────────
+    const pwInput    = document.getElementById('signup-password');
+    const strengthEl = document.getElementById('pw-strength');
+    const labelEl    = document.getElementById('pw-strength-label');
+    const bars       = [document.getElementById('bar1'), document.getElementById('bar2'),
+                        document.getElementById('bar3'), document.getElementById('bar4')];
+
+    function getStrength(pw) {
+      let score = 0;
+      if (pw.length >= 6)  score++;
+      if (pw.length >= 10) score++;
+      if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+      if (/[^a-zA-Z0-9]/.test(pw)) score++;
+      return score;
+    }
+
+    pwInput.addEventListener('input', () => {
+      const pw = pwInput.value;
+      if (!pw) { strengthEl.style.display = 'none'; return; }
+      strengthEl.style.display = '';
+      const score = getStrength(pw);
+      const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+      const classes = ['weak', 'fair', 'good', 'strong'];
+      bars.forEach((bar, i) => {
+        bar.className = 'pw-bar';
+        if (i < score) bar.classList.add(classes[score - 1]);
+      });
+      labelEl.textContent = labels[score - 1] || 'Weak';
+      labelEl.style.color = ['#e05a5a','#e6a817','#50c878','#50c878'][score - 1] || '#e05a5a';
+    });
+
+    // ── Form submit ──────────────────────────────────────────
+    document.getElementById('signup-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name     = document.getElementById('signup-name').value.trim();
+      const email    = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const confirm  = document.getElementById('signup-confirm').value;
+      const errEl    = document.getElementById('signup-error');
+
+      errEl.classList.remove('show');
+
+      if (!name || !email || !password || !confirm) {
+        errEl.textContent = 'Please fill in all fields.';
+        errEl.classList.add('show'); return;
+      }
+      if (password.length < 6) {
+        errEl.textContent = 'Password must be at least 6 characters.';
+        errEl.classList.add('show'); return;
+      }
+      if (password !== confirm) {
+        errEl.textContent = 'Passwords do not match.';
+        errEl.classList.add('show'); return;
+      }
+
+      const result = Auth.signup(name, email, password);
+      if (result.ok) {
+        window.location.href = 'account.html';
+      } else {
+        errEl.textContent = result.error;
+        errEl.classList.add('show');
+      }
+    });
+  </script>
+</body>
+</html>

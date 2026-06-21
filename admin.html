@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Scents by Miral</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body style="background:var(--bg-deepest)">
+
+  <!-- ── Admin Login Screen ──────────────────────────────── -->
+  <div id="admin-login-screen" class="admin-login-screen">
+    <div class="admin-login-card">
+      <span class="brand-main">Scents by Miral</span>
+      <span class="brand-sub">Admin Panel</span>
+      <h2>Welcome Back, Miral</h2>
+      <p>Sign in to manage your store.</p>
+      <div class="auth-form">
+        <div class="auth-form-group">
+          <label>Password</label>
+          <input type="password" id="admin-password-input" placeholder="Enter admin password" />
+        </div>
+        <div id="admin-login-error" class="auth-error">Incorrect password. Try again.</div>
+        <button class="auth-submit" id="admin-login-btn">Access Dashboard</button>
+      </div>
+      <p style="margin-top:1.5rem;font-size:0.72rem;color:var(--text-dim);text-align:center;">
+        Default password: <code style="color:var(--gold)">miral2026</code>
+        &nbsp;—&nbsp; <a href="index.html" style="color:var(--text-dim)">Back to site</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Admin Dashboard ─────────────────────────────────── -->
+  <div id="admin-app" style="display:none;" class="admin-body">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-brand">
+        <span class="brand-main">Scents by Miral</span>
+        <span class="brand-sub">Luxury Fragrances</span>
+        <span class="admin-badge">Admin</span>
+      </div>
+      <nav class="admin-nav">
+        <div class="admin-nav-section">Main</div>
+        <a href="#" class="admin-nav-link active" data-panel="dashboard">
+          <span class="admin-nav-icon">⊞</span> Dashboard
+        </a>
+        <a href="#" class="admin-nav-link" data-panel="products">
+          <span class="admin-nav-icon">◈</span> Products
+        </a>
+        <a href="#" class="admin-nav-link" data-panel="add-product">
+          <span class="admin-nav-icon">＋</span> Add Product
+        </a>
+        <a href="#" class="admin-nav-link" data-panel="featured">
+          <span class="admin-nav-icon">★</span> Featured
+        </a>
+        <div class="admin-nav-section">Customers</div>
+        <a href="#" class="admin-nav-link" data-panel="subscribers">
+          <span class="admin-nav-icon">✉</span> Subscribers
+        </a>
+        <a href="#" class="admin-nav-link" data-panel="customers">
+          <span class="admin-nav-icon">◉</span> Accounts
+        </a>
+        <div class="admin-nav-section">Site</div>
+        <a href="index.html" class="admin-nav-link" target="_blank">
+          <span class="admin-nav-icon">↗</span> View Site
+        </a>
+        <a href="shop.html" class="admin-nav-link" target="_blank">
+          <span class="admin-nav-icon">↗</span> View Shop
+        </a>
+      </nav>
+      <div class="admin-nav-footer">
+        <a href="#" class="admin-logout" id="admin-logout-btn">
+          <span>⎋</span> Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin-main">
+
+      <!-- ── Dashboard ─────────────────────────────────────── -->
+      <div id="panel-dashboard" class="admin-panel active">
+        <div class="admin-topbar">
+          <h1>Dashboard</h1>
+          <div class="admin-topbar-right">
+            <span id="dash-date"></span>
+          </div>
+        </div>
+
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-label">Total Products</div>
+            <div class="stat-card-value" id="stat-total-products">—</div>
+            <div class="stat-card-sub">In your catalog</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Active Listings</div>
+            <div class="stat-card-value" id="stat-active">—</div>
+            <div class="stat-card-sub">Visible in shop</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Total Stock</div>
+            <div class="stat-card-value" id="stat-stock">—</div>
+            <div class="stat-card-sub">Units across all SKUs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Subscribers</div>
+            <div class="stat-card-value" id="stat-subscribers">—</div>
+            <div class="stat-card-sub">Newsletter signups</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Customer Accounts</div>
+            <div class="stat-card-value" id="stat-accounts">—</div>
+            <div class="stat-card-sub">Registered users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Catalog Value</div>
+            <div class="stat-card-value" id="stat-value">—</div>
+            <div class="stat-card-sub">At current prices</div>
+          </div>
+        </div>
+
+        <!-- Low stock alert -->
+        <div id="low-stock-section" style="margin-bottom:2rem;display:none;">
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>⚠ Low Stock Alert</h3>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th><th>Category</th><th>Stock</th><th>Price</th>
+                </tr>
+              </thead>
+              <tbody id="low-stock-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent products -->
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>Recent Products</h3>
+            <a href="#" class="btn btn-outline" style="font-size:0.72rem;padding:0.4rem 1rem;" data-panel="products">View All</a>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dash-recent-products"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Products ──────────────────────────────────────── -->
+      <div id="panel-products" class="admin-panel">
+        <div class="admin-topbar">
+          <h1>Products</h1>
+          <a href="#" class="btn btn-gold" style="font-size:0.75rem;" data-panel="add-product">+ Add Product</a>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>All Products</h3>
+            <span id="product-count" style="font-size:0.78rem;color:var(--text-muted);"></span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Color</th><th>Name</th><th>Category</th><th>Price</th>
+                <th>Size</th><th>Stock</th><th>Status</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Add / Edit Product ────────────────────────────── -->
+      <div id="panel-add-product" class="admin-panel">
+        <div class="admin-topbar">
+          <h1 id="add-product-title">Add Product</h1>
+        </div>
+        <div class="admin-form-wrap">
+          <h3 id="add-product-form-label">New Product Details</h3>
+          <form id="product-form" novalidate>
+            <input type="hidden" id="edit-product-id" value="" />
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Product Name *</label>
+                <input type="text" id="f-name" placeholder="e.g. Rose de Minuit" required />
+              </div>
+              <div class="form-group">
+                <label>Category *</label>
+                <select id="f-category">
+                  <option value="">Select category</option>
+                  <option>Floral</option>
+                  <option>Oriental</option>
+                  <option>Fresh</option>
+                  <option>Woody</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Notes (top · middle · base)</label>
+                <input type="text" id="f-notes" placeholder="e.g. Rose · Amber · Sandalwood" />
+              </div>
+              <div class="form-group">
+                <label>Size</label>
+                <input type="text" id="f-size" placeholder="e.g. 50 ml" value="50 ml" />
+              </div>
+              <div class="form-group">
+                <label>Price (USD) *</label>
+                <input type="number" id="f-price" placeholder="e.g. 89" min="1" step="0.01" />
+              </div>
+              <div class="form-group">
+                <label>Stock Quantity</label>
+                <input type="number" id="f-stock" placeholder="e.g. 25" min="0" value="10" />
+              </div>
+              <div class="form-group">
+                <label>Badge (optional)</label>
+                <select id="f-badge">
+                  <option value="">None</option>
+                  <option>New</option>
+                  <option>Bestseller</option>
+                  <option>Limited</option>
+                  <option>Premium</option>
+                  <option>Exclusive</option>
+                  <option>Sale</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Visible in Shop</label>
+                <select id="f-active">
+                  <option value="true">Yes — Active</option>
+                  <option value="false">No — Hidden</option>
+                </select>
+              </div>
+              <div class="form-group full">
+                <label>Description</label>
+                <textarea id="f-description" rows="3" placeholder="A short poetic description of the fragrance..."></textarea>
+              </div>
+              <div class="form-group full">
+                <label>Product Image</label>
+                <div class="image-upload">
+                  <div class="image-upload-preview" id="image-preview">
+                    <span id="image-placeholder">No image</span>
+                  </div>
+                  <div class="image-upload-controls">
+                    <input type="file" id="f-image-file" accept="image/*" hidden />
+                    <button type="button" class="btn btn-outline" id="image-upload-btn">Upload Image</button>
+                    <button type="button" class="btn btn-ghost" id="image-remove-btn" style="display:none;">Remove</button>
+                    <p class="image-upload-hint">
+                      JPG or PNG — square images look best. Saved in your browser, so keep files small.
+                    </p>
+                  </div>
+                </div>
+                <input type="hidden" id="f-image" />
+                <input type="hidden" id="f-gradient" value="linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 40%, #8a3060 80%, #c8a96e 100%)" />
+              </div>
+            </div>
+            <div id="product-form-error" class="auth-error"></div>
+            <div class="admin-form-actions">
+              <button type="submit" class="btn btn-gold" id="product-form-submit">Save Product</button>
+              <button type="button" class="btn btn-ghost" id="product-form-cancel">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── Featured Fragrances ───────────────────────────── -->
+      <div id="panel-featured" class="admin-panel">
+        <div class="admin-topbar">
+          <h1>Featured Fragrances</h1>
+          <span id="featured-count" style="font-size:0.85rem;color:var(--text-muted);"></span>
+        </div>
+        <div class="admin-form-wrap">
+          <h3>Choose what appears on the homepage</h3>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin:0.5rem 0 1.5rem;">
+            Tick the fragrances you want shown in the homepage
+            <strong style="color:var(--gold)">“Featured Fragrances”</strong> grid.
+            If you don’t pick any, the first four active products are shown automatically.
+          </p>
+          <div id="featured-list" class="featured-pick-list"></div>
+          <div id="featured-empty" style="text-align:center;padding:3rem;color:var(--text-muted);display:none;">
+            No products yet. Add products first, then choose your featured ones.
+          </div>
+          <div class="admin-form-actions" style="margin-top:1.5rem;">
+            <button type="button" class="btn btn-gold" id="featured-save">Save Featured Selection</button>
+            <button type="button" class="btn btn-ghost" id="featured-clear">Clear Selection</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Subscribers ───────────────────────────────────── -->
+      <div id="panel-subscribers" class="admin-panel">
+        <div class="admin-topbar">
+          <h1>Newsletter Subscribers</h1>
+          <span id="sub-count" style="font-size:0.85rem;color:var(--text-muted);"></span>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>Subscriber List</h3>
+            <span style="font-size:0.75rem;color:var(--text-muted);">
+              Notification email: <strong style="color:var(--gold)">olayemisamuel5@gmail.com</strong>
+            </span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>#</th><th>Email</th><th>Date Subscribed</th></tr>
+            </thead>
+            <tbody id="subscribers-body"></tbody>
+          </table>
+          <div id="subscribers-empty" style="text-align:center;padding:3rem;color:var(--text-muted);display:none;">
+            No subscribers yet.
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Customer Accounts ─────────────────────────────── -->
+      <div id="panel-customers" class="admin-panel">
+        <div class="admin-topbar">
+          <h1>Customer Accounts</h1>
+          <span id="customer-count" style="font-size:0.85rem;color:var(--text-muted);"></span>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-header">
+            <h3>Registered Customers</h3>
+          </div>
+          <table>
+            <thead>
+              <tr><th>#</th><th>Name</th><th>Email</th><th>Joined</th></tr>
+            </thead>
+            <tbody id="customers-body"></tbody>
+          </table>
+          <div id="customers-empty" style="text-align:center;padding:3rem;color:var(--text-muted);display:none;">
+            No customer accounts yet.
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/products.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

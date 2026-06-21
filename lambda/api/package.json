@@ -1,0 +1,10 @@
+{
+  "name": "sbm-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Scents by Miral — Lambda API handler",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  }
+}

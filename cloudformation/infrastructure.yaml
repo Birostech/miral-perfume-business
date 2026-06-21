@@ -1,0 +1,337 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Scents by Miral — Application Infrastructure.
+  Provisions S3, CloudFront, Cognito, DynamoDB, Lambda, and API Gateway.
+  Deployed automatically by CodePipeline on every push to GitHub.
+
+Parameters:
+
+  ArtifactBucket:
+    Type: String
+    Description: S3 bucket where CodePipeline stores build artifacts (created by pipeline.yaml)
+
+  LambdaZipKey:
+    Type: String
+    Description: S3 key for the packaged Lambda function
+    Default: lambda-api.zip
+
+# ================================================================
+# RESOURCES
+# ================================================================
+Resources:
+
+  # ── S3: Website Hosting ──────────────────────────────────────
+  # Stores all your HTML, CSS, and JS files.
+  # NOT publicly accessible directly — CloudFront is the only gateway.
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "scents-by-miral-website-${AWS::AccountId}"
+
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      PolicyDocument:
+        Statement:
+          - Sid: AllowCloudFrontOnly
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${WebsiteBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  # ── CloudFront: CDN ──────────────────────────────────────────
+  # Sits in front of S3 — serves files fast globally via AWS edge
+  # locations, forces HTTPS, and handles custom domain if you add one.
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: scents-by-miral-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        HttpVersion: http2
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt WebsiteBucket.RegionalDomainName
+            OriginAccessControlId: !Ref CloudFrontOAC
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          # CachingOptimized policy — caches aggressively for speed
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          AllowedMethods: [GET, HEAD, OPTIONS]
+          CachedMethods: [GET, HEAD]
+        # Serve index.html for 403/404 so browser routing works
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+
+  # ── Cognito: User Pool ───────────────────────────────────────
+  # The user directory — stores accounts, handles passwords,
+  # sends verification emails, and issues JWT tokens on login.
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: scents-by-miral-users
+      UsernameAttributes:
+        - email                       # users log in with email, not username
+      AutoVerifiedAttributes:
+        - email                       # Cognito sends a verification email on signup
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 6
+          RequireUppercase: false
+          RequireNumbers: false
+          RequireSymbols: false
+      Schema:
+        - Name: name
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+      UserPoolTags:
+        Project: ScentsByMiral
+
+  # App Client — the "key" your website uses to talk to Cognito.
+  # GenerateSecret: false is required for browser-based apps.
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: scents-by-miral-web
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      AccessTokenValidity: 1         # hours
+      IdTokenValidity: 1             # hours
+      RefreshTokenValidity: 30       # days — keeps users logged in
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+
+  # ── DynamoDB: Wishlist ───────────────────────────────────────
+  # userId = Cognito user ID (unique per user)
+  # productId = the fragrance ID from products.js
+  WishlistTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: sbm-wishlist
+      BillingMode: PAY_PER_REQUEST   # no capacity planning needed, pay per use
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: productId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH              # partition key — all wishlists for one user
+        - AttributeName: productId
+          KeyType: RANGE             # sort key — each product in the wishlist
+
+  # ── DynamoDB: Addresses ──────────────────────────────────────
+  AddressesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: sbm-addresses
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: addressId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: addressId
+          KeyType: RANGE
+
+  # ── DynamoDB: Products ───────────────────────────────────────
+  # Admin-managed product catalog, replacing the admin localStorage approach.
+  ProductsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: sbm-products
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: productId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: productId
+          KeyType: HASH
+
+  # ── IAM: Lambda Execution Role ───────────────────────────────
+  # Grants Lambda permission to write logs and read/write DynamoDB.
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: sbm-lambda-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource:
+                  - !GetAtt WishlistTable.Arn
+                  - !GetAtt AddressesTable.Arn
+                  - !GetAtt ProductsTable.Arn
+
+  # ── Lambda: API Handler ──────────────────────────────────────
+  # One function handles all API routes (wishlist, addresses, products).
+  # Code lives in lambda/api/index.mjs in your repo.
+  ApiFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: sbm-api
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        S3Bucket: !Ref ArtifactBucket
+        S3Key: !Ref LambdaZipKey
+      Environment:
+        Variables:
+          WISHLIST_TABLE:  !Ref WishlistTable
+          ADDRESSES_TABLE: !Ref AddressesTable
+          PRODUCTS_TABLE:  !Ref ProductsTable
+      Timeout: 15
+      MemorySize: 128
+
+  # ── API Gateway: HTTP API ────────────────────────────────────
+  # Exposes the Lambda function as REST-style endpoints the browser calls.
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: sbm-api
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - !Sub "https://${CloudFrontDistribution.DomainName}"
+        AllowMethods: [GET, POST, DELETE, OPTIONS]
+        AllowHeaders: [Content-Type, Authorization]
+
+  # Cognito JWT Authorizer — API Gateway validates the user's token
+  # automatically. If the token is missing or expired, it returns 401
+  # before Lambda is ever called.
+  CognitoAuthorizer:
+    Type: AWS::ApiGatewayV2::Authorizer
+    Properties:
+      ApiId: !Ref HttpApi
+      AuthorizerType: JWT
+      Name: CognitoAuthorizer
+      IdentitySource:
+        - "$request.header.Authorization"
+      JwtConfiguration:
+        Audience:
+          - !Ref UserPoolClient
+        Issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}"
+
+  ApiIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt ApiFunction.Arn
+      PayloadFormatVersion: "2.0"
+
+  # All routes go through the Cognito authorizer
+  ApiRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: "ANY /{proxy+}"
+      AuthorizationType: JWT
+      AuthorizerId: !Ref CognitoAuthorizer
+      Target: !Sub "integrations/${ApiIntegration}"
+
+  ApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: "$default"
+      AutoDeploy: true
+
+  ApiLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ApiFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*"
+
+# ================================================================
+# OUTPUTS — values the buildspec and frontend code need
+# ================================================================
+Outputs:
+
+  WebsiteBucket:
+    Description: S3 bucket holding the website files
+    Value: !Ref WebsiteBucket
+    Export:
+      Name: SBM-WebsiteBucket
+
+  CloudFrontDomain:
+    Description: Your live site URL (use this until you attach a custom domain)
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+    Export:
+      Name: SBM-CloudFrontDomain
+
+  CloudFrontId:
+    Description: CloudFront distribution ID (used by buildspec to clear cache)
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: SBM-CloudFrontId
+
+  UserPoolId:
+    Description: Paste this into js/auth.js as UserPoolId
+    Value: !Ref UserPool
+    Export:
+      Name: SBM-UserPoolId
+
+  UserPoolClientId:
+    Description: Paste this into js/auth.js as ClientId
+    Value: !Ref UserPoolClient
+    Export:
+      Name: SBM-UserPoolClientId
+
+  ApiEndpoint:
+    Description: API Gateway base URL — used by the frontend to call Lambda
+    Value: !GetAtt HttpApi.ApiEndpoint
+    Export:
+      Name: SBM-ApiEndpoint

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scents by Miral — Luxury Fragrances</title>
+  <meta name="description" content="Discover rare, handcrafted luxury fragrances by Scents by Miral. Each bottle holds a story.">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="classic">
+
+  <!-- ═══════════════════════════════════════════════════════
+       CLASSIC HEADER — brand left, nav right
+  ═══════════════════════════════════════════════════════════ -->
+  <header class="classic-header">
+
+    <!-- Brand (left) -->
+    <a href="index.html" class="classic-brand">
+      <span class="classic-brand-main">Scents by Miral</span>
+      <span class="classic-brand-sub">Luxury Fragrances</span>
+    </a>
+
+    <!-- Nav + actions (right) -->
+    <div class="classic-right">
+      <nav class="classic-nav">
+        <a href="shop.html">Shop</a>
+        <a href="index.html#collections">Collections</a>
+        <a href="index.html#about">Our Story</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+
+      <a href="login.html" class="classic-util" id="nav-account-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span id="nav-account-label">Sign In</span>
+      </a>
+
+      <a href="cart.html" class="classic-util cart-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        Cart
+        <span class="cart-count" style="display:none">0</span>
+      </a>
+
+      <button class="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Mobile Menu ─────────────────────────────────────────── -->
+  <div class="mobile-menu">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="#collections">Collections</a>
+    <a href="#contact">Contact</a>
+    <a href="login.html">Sign In</a>
+    <a href="cart.html">Cart</a>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       HERO — full-width photo, centered text
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="classic-hero">
+    <div class="classic-hero-img"
+         style="background-image:url('https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?auto=format&fit=crop&w=1600&q=80');">
+    </div>
+    <div class="classic-hero-overlay"></div>
+    <div class="classic-hero-content">
+      <span class="classic-hero-eyebrow">Signature Collection — 2026</span>
+      <h1 class="classic-hero-title">Timeless Fragrance</h1>
+      <p class="classic-hero-sub">
+        Rare ingredients, handcrafted into scents worth remembering.
+      </p>
+      <a href="shop.html" class="btn btn-gold classic-hero-btn">Shop Now</a>
+    </div>
+  </section>
+
+  <!-- ── Trust strip ─────────────────────────────────────────── -->
+  <div class="classic-trust">
+    <div class="classic-trust-item">
+      <span class="ct-icon">✦</span>
+      <span>Handcrafted in Small Batches</span>
+    </div>
+    <div class="classic-trust-item">
+      <span class="ct-icon">✦</span>
+      <span>Free Shipping over $150</span>
+    </div>
+    <div class="classic-trust-item">
+      <span class="ct-icon">✦</span>
+      <span>Rare, Natural Ingredients</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FEATURED PRODUCTS — centered, balanced grid
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="classic-section" id="featured">
+    <div class="classic-section-head">
+      <span class="section-label">Curated Selection</span>
+      <h2>Featured Fragrances</h2>
+      <div class="classic-rule"></div>
+      <p>A handpicked edit from our collection — discover your signature scent.</p>
+    </div>
+
+    <div class="products-grid-editorial" id="featured-grid">
+      <!-- rendered by main.js -->
+    </div>
+
+    <div class="classic-section-foot">
+      <a href="shop.html" class="btn btn-outline">View All Fragrances</a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FRAGRANCE FAMILIES — centered cards
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="classic-section classic-families" id="collections">
+    <div class="classic-section-head">
+      <span class="section-label">Explore by Family</span>
+      <h2>Fragrance Families</h2>
+      <div class="classic-rule"></div>
+    </div>
+
+    <div class="classic-family-grid">
+      <a href="shop.html?filter=Oriental" class="classic-family">
+        <span class="cf-bg" style="background:linear-gradient(160deg,#0a0510,#1a0a2e 45%,#8a3060 85%,#c8a96e)"></span>
+        <span class="cf-name">Oriental</span>
+        <span class="cf-notes">Oud · Amber · Myrrh</span>
+      </a>
+      <a href="shop.html?filter=Floral" class="classic-family">
+        <span class="cf-bg" style="background:linear-gradient(160deg,#120510,#3e0a20 45%,#a84060 85%,#d4a0b0)"></span>
+        <span class="cf-name">Floral</span>
+        <span class="cf-notes">Rose · Gardenia · Iris</span>
+      </a>
+      <a href="shop.html?filter=Fresh" class="classic-family">
+        <span class="cf-bg" style="background:linear-gradient(160deg,#020810,#0a1a3e 45%,#2a6a9e 85%,#8ab8d8)"></span>
+        <span class="cf-name">Fresh</span>
+        <span class="cf-notes">Aquatic · Citrus · Green</span>
+      </a>
+      <a href="shop.html?filter=Woody" class="classic-family">
+        <span class="cf-bg" style="background:linear-gradient(160deg,#0a0500,#281800 45%,#7a5200 85%,#c8a96e)"></span>
+        <span class="cf-name">Woody</span>
+        <span class="cf-notes">Cedar · Sandalwood · Vetiver</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       OUR STORY — centered, image above text
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="classic-section classic-story" id="about">
+    <div class="classic-story-inner">
+      <div class="classic-story-img">
+        <img
+          src="https://images.unsplash.com/photo-1595425970377-452526c05d8e?auto=format&fit=crop&w=900&q=80"
+          alt="The story behind Scents by Miral"
+          loading="lazy"
+        />
+      </div>
+      <div class="classic-story-text">
+        <span class="section-label">Our Story</span>
+        <h2>Born from a Passion for <span class="gold-text">Fine Fragrance</span></h2>
+        <div class="classic-rule center"></div>
+        <p>
+          Scents by Miral was founded on the belief that fragrance is the most intimate
+          form of self-expression. What you wear speaks before you do.
+        </p>
+        <p>
+          Every formula is developed with meticulous care — blending traditional perfumery
+          with contemporary sensibilities, using only the finest raw materials from around
+          the world. Each bottle is a chapter. Each scent, a story waiting to be worn.
+        </p>
+        <div class="classic-stats">
+          <div>
+            <div class="stat-value">12+</div>
+            <div class="stat-label">Unique Scents</div>
+          </div>
+          <div>
+            <div class="stat-value">4</div>
+            <div class="stat-label">Families</div>
+          </div>
+          <div>
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Handcrafted</div>
+          </div>
+        </div>
+        <a href="shop.html" class="btn btn-gold" style="margin-top:1.75rem;">Discover the Collection</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       NEWSLETTER — centered
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="classic-newsletter" id="contact">
+    <div class="classic-newsletter-inner">
+      <span class="section-label">Stay Connected</span>
+      <h2>Join the Inner Circle</h2>
+      <div class="classic-rule center"></div>
+      <p>
+        Be the first to know about new launches, exclusive offers, and the rare
+        ingredients behind our fragrances. No noise — just luxury, delivered quietly.
+      </p>
+      <form class="classic-newsletter-form" id="newsletter-form" novalidate>
+        <input type="email" id="newsletter-email" placeholder="you@example.com" required />
+        <button type="submit" class="btn btn-gold">Subscribe</button>
+      </form>
+      <p class="classic-newsletter-note">We respect your privacy. Unsubscribe at any time.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="brand-main">Scents by Miral</span>
+        <span class="brand-sub">Luxury Fragrances</span>
+        <p>Rare ingredients. Handcrafted formulas.<br/>Unforgettable signatures.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="shop.html">All Fragrances</a></li>
+          <li><a href="shop.html?filter=Floral">Floral</a></li>
+          <li><a href="shop.html?filter=Oriental">Oriental</a></li>
+          <li><a href="shop.html?filter=Fresh">Fresh</a></li>
+          <li><a href="shop.html?filter=Woody">Woody</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Info</h4>
+        <ul>
+          <li><a href="#about">Our Story</a></li>
+          <li><a href="#">Ingredients</a></li>
+          <li><a href="#">Sustainability</a></li>
+          <li><a href="#">Gift Wrapping</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <ul>
+          <li><a href="#">Shipping & Returns</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+          <li><a href="#">Track Order</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Scents by Miral. All rights reserved.</span>
+      <span>
+        Privacy Policy &nbsp;·&nbsp; Terms of Service
+        &nbsp;·&nbsp; <a href="admin.html" style="color:var(--text-dim);font-size:0.7rem;">Admin</a>
+      </span>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

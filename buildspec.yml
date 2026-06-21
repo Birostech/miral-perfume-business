@@ -1,0 +1,58 @@
+version: 0.2
+
+# CodeBuild runs this file every time you push to GitHub.
+# It packages the Lambda function, deploys infrastructure via
+# CloudFormation, uploads the website to S3, and clears the
+# CloudFront cache so visitors see the latest version immediately.
+
+phases:
+
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing Lambda dependencies..."
+      - cd lambda/api && npm ci --production && cd ../..
+
+  build:
+    commands:
+      - echo "Packaging Lambda function into a zip..."
+      - cd lambda/api && zip -r ../../lambda-api.zip . && cd ../..
+      - echo "Uploading Lambda package to S3 artifact bucket..."
+      - aws s3 cp lambda-api.zip s3://$ARTIFACT_BUCKET/lambda-api.zip
+
+  post_build:
+    commands:
+      - echo "Deploying / updating AWS infrastructure..."
+      - |
+        aws cloudformation deploy \
+          --template-file cloudformation/infrastructure.yaml \
+          --stack-name scents-by-miral \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --parameter-overrides \
+              ArtifactBucket=$ARTIFACT_BUCKET \
+              LambdaZipKey=lambda-api.zip \
+          --no-fail-on-empty-changeset
+
+      - echo "Getting website S3 bucket name from stack outputs..."
+      - BUCKET=$(aws cloudformation describe-stacks --stack-name scents-by-miral --query "Stacks[0].Outputs[?OutputKey=='WebsiteBucket'].OutputValue" --output text)
+
+      - echo "Uploading website files to S3..."
+      - |
+        aws s3 sync . s3://$BUCKET \
+          --exclude ".git/*" \
+          --exclude "cloudformation/*" \
+          --exclude "lambda/*" \
+          --exclude "buildspec.yml" \
+          --exclude "*.zip" \
+          --delete
+
+      - echo "Clearing CloudFront cache so changes go live immediately..."
+      - DIST_ID=$(aws cloudformation describe-stacks --stack-name scents-by-miral --query "Stacks[0].Outputs[?OutputKey=='CloudFrontId'].OutputValue" --output text)
+      - aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
+
+      - echo "Deployment complete."
+
+artifacts:
+  files:
+    - "**/*"
